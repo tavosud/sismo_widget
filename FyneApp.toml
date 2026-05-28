@@ -1,0 +1,7 @@
+Website = ""
+
+[Details]
+  Name = "Sismo Widget"
+  Version = "1.0.0"
+  Icon = "assets/images/logo.png"
+  ID = "com.sismowidget.app"

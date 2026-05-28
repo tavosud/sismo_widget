@@ -1,0 +1,24 @@
+# Binarios
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build output
+sismo_widget.exe
+
+# Build objects
+*.o
+*.a
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+Thumbs.db
+.DS_Store
