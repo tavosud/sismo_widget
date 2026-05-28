@@ -32,12 +32,12 @@ Widget de escritorio para Windows que muestra en tiempo real el **último sismo 
 
 ### Desde el binario
 
-Descarga el `.exe` de la sección [Releases](https://github.com/tuusuario/sismo_widget/releases) y ejecútalo.
+Descarga el `.exe` de la sección [Releases](https://github.com/tavosud/sismo_widget/releases) y ejecútalo.
 
 ### Compilar desde código
 
 ```powershell
-git clone https://github.com/tuusuario/sismo_widget.git
+git clone https://github.com/tavosud/sismo_widget.git
 cd sismo_widget
 go build -ldflags="-H windowsgui" -o sismo_widget.exe ./cmd/sismo_widget/
 ```
