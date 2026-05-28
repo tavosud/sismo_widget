@@ -4,7 +4,7 @@ Widget de escritorio para Windows que muestra en tiempo real el **último sismo 
 
 ## Captura
 
-![Sismo Widget](assets/images/screenshot.png)
+![Sismo Widget](assets/images/screenshot.jpg)
 
 ## Características
 
