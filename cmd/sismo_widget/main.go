@@ -1,9 +1,9 @@
 package main
 
 import (
+	_ "embed"
 	"log"
 	"os"
-	"path/filepath"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -13,6 +13,9 @@ import (
 	"sismo_widget/internal/ui"
 	"sismo_widget/internal/usecase"
 )
+
+//go:embed logo.png
+var logoPNG []byte
 
 func main() {
 	if ui.IsAlreadyRunning() {
@@ -37,12 +40,10 @@ func main() {
 
 	myApp := app.NewWithID("com.sismowidget.app")
 
-	iconPath := filepath.Join("assets", "images", "logo.png")
-	if _, err := os.Stat(iconPath); err == nil {
-		iconBytes, _ := os.ReadFile(iconPath)
+	if len(logoPNG) > 0 {
 		myApp.SetIcon(&fyne.StaticResource{
 			StaticName:    "logo.png",
-			StaticContent: iconBytes,
+			StaticContent: logoPNG,
 		})
 	} else {
 		myApp.SetIcon(theme.WarningIcon())
