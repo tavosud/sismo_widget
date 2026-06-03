@@ -1,16 +1,20 @@
 package ui
 
 import (
+	"bytes"
+	_ "embed"
 	"encoding/binary"
+	"io"
 	"math"
-	"os"
-	"path/filepath"
 	"syscall"
 	"time"
 	"unsafe"
 
 	"github.com/faiface/beep/mp3"
 )
+
+//go:embed sounds/alerta1.mp3
+var alertaMP3 []byte
 
 var (
 	winmm               = syscall.NewLazyDLL("winmm.dll")
@@ -114,14 +118,11 @@ type pcmAudio struct {
 }
 
 func decodeAlertToPCM() (*pcmAudio, error) {
-	rutaAudio := filepath.Join("assets", "sounds", "alerta1.mp3")
-	f, err := os.Open(rutaAudio)
-	if err != nil {
-		return nil, err
+	if len(alertaMP3) == 0 {
+		return nil, nil
 	}
-	defer f.Close()
-
-	streamer, format, err := mp3.Decode(f)
+	reader := io.NopCloser(bytes.NewReader(alertaMP3))
+	streamer, format, err := mp3.Decode(reader)
 	if err != nil {
 		return nil, err
 	}

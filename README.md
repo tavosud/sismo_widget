@@ -19,7 +19,7 @@ Widget de escritorio para Windows que muestra en tiempo real el **último sismo 
 - **Configuración persistente** — coordenadas, umbrales de alerta y filtros guardados en JSON
 - **Historial** — ventana con los últimos 50 sismos que pasan el filtro
 - **Simulacro** — botón para simular una alerta sísmica y probar la configuración
-- **Sonido de alarma** — reproduce un sonido al mostrar la alerta (archivo `assets/sounds/alerta1.mp3`)
+- **Sonido de alarma** — reproduce un sonido al mostrar la alerta (MP3 embebido en el binario)
 - **Selección de dispositivo de audio** — elige en qué salida de audio reproducir la alarma (solo para esta aplicación, sin afectar al sistema)
 - **Instancia única** — bloquea la ejecución de una segunda instancia del programa
 
@@ -33,7 +33,7 @@ Widget de escritorio para Windows que muestra en tiempo real el **último sismo 
 
 ### Desde el binario
 
-Descarga el `.exe` de la sección [Releases](https://github.com/tavosud/sismo_widget/releases) y ejecútalo.
+Descarga `SismoWidget.exe` desde la sección [Releases](https://github.com/tavosud/sismo_widget/releases). Es un solo archivo, no requiere assets externos.
 
 ### Compilar desde código
 
@@ -43,7 +43,7 @@ cd sismo_widget
 go build -ldflags "-s -w -H=windowsgui" -o SismoWidget.exe ./cmd/sismo_widget/
 ```
 
-Los flags `-s -w` eliminan información de depuración (binario más pequeño) y `-H windowsgui` suprime la ventana de consola. El icono de la aplicación se incluye automáticamente gracias al archivo `resource.syso`.
+Los flags `-s -w` eliminan información de depuración (binario más pequeño) y `-H windowsgui` suprime la ventana de consola. El icono de la aplicación y el sonido de alarma están embebidos en el binario, no requiere archivos externos.
 
 ## Uso
 
@@ -109,8 +109,9 @@ sismo_widget/
 │       ├── widget_map.go          # Carga de tiles OpenStreetMap
 │       ├── widget_polling.go      # Polling y actualización de UI
 │       ├── alert_window.go        # Ventana de alerta a pantalla completa
-│       ├── audio_device_windows.go # Reproducción de audio por dispositivo (winmm)
+│       ├── audio_device_windows.go # Reproducción de audio por dispositivo (winmm), MP3 embebido
 │       ├── audio_device_other.go   # Stubs para otras plataformas
+│       ├── sounds/                 # alerta1.mp3 (embebido en el binario via //go:embed)
 │       ├── utils.go               # Helpers (posición, IP, config, historial)
 │       ├── window_position_windows.go  # Win32 API (frameless, arrastre, posición)
 │       └── window_position_other.go    # Stubs para otras plataformas
