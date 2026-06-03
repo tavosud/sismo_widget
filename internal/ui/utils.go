@@ -58,7 +58,6 @@ func MostrarVentanaConfig(
 	win.Resize(fyne.NewSize(480, 620))
 	win.CenterOnScreen()
 	win.SetCloseIntercept(func() {
-		win.Close()
 		fyneApp.Quit()
 	})
 
@@ -364,6 +363,11 @@ func iniciarSystray(fyneApp fyne.App, widgetWin fyne.Window, configManager *usec
 		}),
 		fyne.NewMenuItemSeparator(),
 		fyne.NewMenuItem("Salir", func() {
+			guardarPosicionVentana(configManager)
+			go func() {
+				time.Sleep(200 * time.Millisecond)
+				os.Exit(0)
+			}()
 			fyneApp.Quit()
 		}),
 	)
