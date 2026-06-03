@@ -20,6 +20,7 @@ Widget de escritorio para Windows que muestra en tiempo real el **último sismo 
 - **Historial** — ventana con los últimos 50 sismos que pasan el filtro
 - **Simulacro** — botón para simular una alerta sísmica y probar la configuración
 - **Sonido de alarma** — reproduce un sonido al mostrar la alerta (archivo `assets/sounds/alerta1.mp3`)
+- **Selección de dispositivo de audio** — elige en qué salida de audio reproducir la alarma (solo para esta aplicación, sin afectar al sistema)
 - **Instancia única** — bloquea la ejecución de una segunda instancia del programa
 
 ## Requisitos
@@ -39,10 +40,10 @@ Descarga el `.exe` de la sección [Releases](https://github.com/tavosud/sismo_wi
 ```powershell
 git clone https://github.com/tavosud/sismo_widget.git
 cd sismo_widget
-go build -ldflags="-H windowsgui" -o sismo_widget.exe ./cmd/sismo_widget/
+go build -ldflags "-s -w -H=windowsgui" -o SismoWidget.exe ./cmd/sismo_widget/
 ```
 
-El flag `-H windowsgui` suprime la ventana de consola.
+Los flags `-s -w` eliminan información de depuración (binario más pequeño) y `-H windowsgui` suprime la ventana de consola. El icono de la aplicación se incluye automáticamente gracias al archivo `resource.syso`.
 
 ## Uso
 
@@ -75,16 +76,17 @@ Campos disponibles en la ventana de configuración:
 | Magnitud mín. filtro | Magnitud mínima para guardar en historial | 2.0 |
 | Distancia máx. filtro (km) | Distancia máxima para guardar en historial | 1000 |
 | Alertar siempre si M ≥ 6 | Ignora los umbrales anteriores para magnitudes ≥ 6 | Activado |
+| Dispositivo de audio | Salida de audio para la alarma (solo esta app) | Predeterminado |
 
-La configuración se guarda en `%APPDATA%\sismo_widget\config.json`.
+La configuración se guarda en `~/.sismo_widget/config.json`.
 
 ## Estructura del proyecto
 
 ```
 sismo_widget/
 ├── assets/
-│   ├── images/           # logo.png, screenshot.png
-│   └── sounds/           # alarma.mp3
+│   ├── images/           # logo.png, logo.ico, screenshot.jpg
+│   └── sounds/           # alerta1.mp3
 ├── cmd/
 │   └── sismo_widget/
 │       └── main.go       # Punto de entrada
@@ -107,6 +109,8 @@ sismo_widget/
 │       ├── widget_map.go          # Carga de tiles OpenStreetMap
 │       ├── widget_polling.go      # Polling y actualización de UI
 │       ├── alert_window.go        # Ventana de alerta a pantalla completa
+│       ├── audio_device_windows.go # Reproducción de audio por dispositivo (winmm)
+│       ├── audio_device_other.go   # Stubs para otras plataformas
 │       ├── utils.go               # Helpers (posición, IP, config, historial)
 │       ├── window_position_windows.go  # Win32 API (frameless, arrastre, posición)
 │       └── window_position_other.go    # Stubs para otras plataformas
@@ -123,7 +127,8 @@ sismo_widget/
 - **API IGP** — `https://ultimosismo.igp.gob.pe/api/ultimo-sismo`
 - **ip-api.com** — geolocalización por IP (autodetección)
 - **Win32 API** — `SetWindowLong`, `DWMWindowAttribute`, `CreateMutexW`, arrastre nativo
-- **[beep](https://github.com/faiface/beep)** — reproducción de audio (alarma)
+- **winmm.dll** — reproducción de audio en el dispositivo seleccionado (`waveOutOpen`, `waveOutWrite`)
+- **[beep](https://github.com/faiface/beep)** — decodificación de MP3 a PCM
 - **[testify](https://github.com/stretchr/testify)** — mocks y aserciones para tests
 
 ## Tests
