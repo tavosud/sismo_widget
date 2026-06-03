@@ -22,7 +22,7 @@ func simularAlerta(fyneApp fyne.App, configManager *usecase.ConfigManager, monit
 	go func() {
 		time.Sleep(500 * time.Millisecond)
 		fyne.Do(func() {
-			alertWin := NewFullscreenAlert(fyneApp)
+			alertWin := NewFullscreenAlert(fyneApp, configManager)
 			alertWin.Show(sismoSimulado)
 		})
 	}()
@@ -141,7 +141,7 @@ func (w *widgetUI) actualizarUI(sismo *entity.Sismo) {
 }
 
 func (w *widgetUI) mostrarAlerta(sismo *entity.Sismo) {
-	alertWin := NewFullscreenAlert(w.fyneApp)
+	alertWin := NewFullscreenAlert(w.fyneApp, w.configMgr)
 	alertWin.Show(sismo)
 	w.fyneApp.SendNotification(&fyne.Notification{
 		Title:   "¡ALERTA SÍSMICA!",

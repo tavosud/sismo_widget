@@ -3,8 +3,6 @@ package ui
 import (
 	"fmt"
 	"math"
-	"os"
-	"path/filepath"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -12,28 +10,25 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/faiface/beep"
-	"github.com/faiface/beep/mp3"
-	"github.com/faiface/beep/speaker"
-
 	"image/color"
 
 	"sismo_widget/internal/entity"
+	"sismo_widget/internal/usecase"
 )
 
 type FullscreenAlert struct {
-	app           fyne.App
-	win           fyne.Window
-	fondo         *canvas.Rectangle
-	audioFile     *os.File
-	audioStreamer beep.StreamSeeker
-	speakerInit   bool
-	running       bool
+	app         fyne.App
+	win         fyne.Window
+	fondo       *canvas.Rectangle
+	running     bool
+	cancelAudio chan struct{}
+	configMgr   *usecase.ConfigManager
 }
 
-func NewFullscreenAlert(app fyne.App) *FullscreenAlert {
+func NewFullscreenAlert(app fyne.App, configMgr *usecase.ConfigManager) *FullscreenAlert {
 	alert := &FullscreenAlert{
-		app: app,
+		app:       app,
+		configMgr: configMgr,
 	}
 	alert.createWindow()
 	return alert
@@ -46,6 +41,7 @@ func (fa *FullscreenAlert) createWindow() {
 
 func (fa *FullscreenAlert) Show(sismo *entity.Sismo) {
 	fa.running = true
+	fa.cancelAudio = make(chan struct{})
 
 	var sitio, distStr, magStr string
 
@@ -131,41 +127,17 @@ func (fa *FullscreenAlert) cerrar() {
 }
 
 func (fa *FullscreenAlert) reproducirAudio() {
-	rutaAudio := filepath.Join("assets", "sounds", "alerta1.mp3")
-
-	if _, err := os.Stat(rutaAudio); os.IsNotExist(err) {
-		return
-	}
-
-	f, err := os.Open(rutaAudio)
+	cfg, err := fa.configMgr.GetConfig()
 	if err != nil {
 		return
 	}
-	fa.audioFile = f
-
-	streamer, _, err := mp3.Decode(f)
-	if err != nil {
-		f.Close()
-		return
-	}
-	fa.audioStreamer = streamer
-
-	if !fa.speakerInit {
-		err = speaker.Init(44100, 44100/10)
-		if err != nil {
-			return
-		}
-		fa.speakerInit = true
-	}
-
-	speaker.Play(beep.Loop(-1, streamer))
+	deviceID := resolveAudioDeviceID(cfg.AudioDevice)
+	go startAlertAudio(deviceID, fa.cancelAudio)
 }
 
 func (fa *FullscreenAlert) detenerAudio() {
-	speaker.Clear()
-	if fa.audioFile != nil {
-		fa.audioFile.Close()
-		fa.audioFile = nil
+	if fa.cancelAudio != nil {
+		close(fa.cancelAudio)
+		fa.cancelAudio = nil
 	}
-	fa.audioStreamer = nil
 }

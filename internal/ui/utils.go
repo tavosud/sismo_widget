@@ -91,6 +91,13 @@ func MostrarVentanaConfig(
 	chkAlertaGlobal := widget.NewCheck("Alertar siempre si Magnitud ≥ 6 (sin importar distancia)", func(v bool) {})
 	chkAlertaGlobal.SetChecked(config.AlertaGlobalMagnitud6)
 
+	selectAudio := widget.NewSelect(GetAudioDeviceNames(), func(s string) {})
+	if config.AudioDevice != "" {
+		selectAudio.SetSelected(config.AudioDevice)
+	} else {
+		selectAudio.SetSelected("Predeterminado")
+	}
+
 	lblEstado := widget.NewLabel("Ajusta tus preferencias.")
 
 	btnAuto := widget.NewButtonWithIcon("Autodetectar por IP", theme.SearchIcon(), func() {
@@ -133,6 +140,7 @@ func MostrarVentanaConfig(
 		nuevoConfig.FiltroMagnitudMin = filtroMag
 		nuevoConfig.FiltroDistanciaMax = filtroDist
 		nuevoConfig.AlertaGlobalMagnitud6 = chkAlertaGlobal.Checked
+		nuevoConfig.AudioDevice = selectAudio.Selected
 		configManager.SaveConfig(nuevoConfig)
 		monitor.UpdateConfig(nuevoConfig)
 
@@ -144,7 +152,7 @@ func MostrarVentanaConfig(
 			go func() {
 				time.Sleep(500 * time.Millisecond)
 				fyne.Do(func() {
-					alertWin := NewFullscreenAlert(fyneApp)
+					alertWin := NewFullscreenAlert(fyneApp, configManager)
 					alertWin.Show(sismoSimulado)
 				})
 			}()
@@ -183,6 +191,7 @@ func MostrarVentanaConfig(
 		nuevoConfig.FiltroMagnitudMin = filtroMag
 		nuevoConfig.FiltroDistanciaMax = filtroDist
 		nuevoConfig.AlertaGlobalMagnitud6 = chkAlertaGlobal.Checked
+		nuevoConfig.AudioDevice = selectAudio.Selected
 		configManager.SaveConfig(nuevoConfig)
 		monitor.UpdateConfig(nuevoConfig)
 
@@ -210,6 +219,9 @@ func MostrarVentanaConfig(
 		),
 		widget.NewSeparator(),
 		chkAlertaGlobal,
+		widget.NewSeparator(),
+		widget.NewLabel("🔊 Dispositivo de audio:"),
+		selectAudio,
 		widget.NewSeparator(),
 		widget.NewLabel("📋 Filtros (registrar en historial):"),
 		widget.NewForm(
